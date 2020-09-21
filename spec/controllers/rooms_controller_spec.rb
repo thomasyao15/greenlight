@@ -257,9 +257,9 @@ describe RoomsController, type: :controller do
       allow_any_instance_of(BigBlueButton::BigBlueButtonApi).to receive(:is_meeting_running?).and_return(true)
 
       @request.session[:user_id] = @user.id
-      post :join, params: { room_uid: @room, join_name: @user.name }
+      post :join, params: { room_uid: @room, join_name: @user.email }
 
-      expect(response).to redirect_to(join_path(@owner.main_room, @user.name, {}, @user.uid))
+      expect(response).to redirect_to(join_path(@owner.main_room, @user.email, {}, @user.uid))
     end
 
     it "should use join name if user is not logged in and meeting running" do
@@ -273,7 +273,7 @@ describe RoomsController, type: :controller do
       allow_any_instance_of(BigBlueButton::BigBlueButtonApi).to receive(:is_meeting_running?).and_return(false)
 
       @request.session[:user_id] = @user.id
-      post :join, params: { room_uid: @room, join_name: @user.name }
+      post :join, params: { room_uid: @room, join_name: @user.email }
 
       expect(response).to render_template(:wait)
     end
@@ -288,9 +288,9 @@ describe RoomsController, type: :controller do
       room.save
 
       @request.session[:user_id] = @user.id
-      post :join, params: { room_uid: room, join_name: @user.name }
+      post :join, params: { room_uid: room, join_name: @user.email }
 
-      expect(response).to redirect_to(join_path(room, @user.name, { user_is_moderator: false }, @user.uid))
+      expect(response).to redirect_to(join_path(room, @user.email, { user_is_moderator: false }, @user.uid))
     end
 
     it "doesn't join the room if the room has the anyone_can_start setting but config is disabled" do
@@ -303,7 +303,7 @@ describe RoomsController, type: :controller do
       room.save
 
       @request.session[:user_id] = @user.id
-      post :join, params: { room_uid: room, join_name: @user.name }
+      post :join, params: { room_uid: room, join_name: @user.email }
 
       expect(response).to render_template(:wait)
     end
@@ -318,9 +318,9 @@ describe RoomsController, type: :controller do
       room.save
 
       @request.session[:user_id] = @user.id
-      post :join, params: { room_uid: room, join_name: @user.name }
+      post :join, params: { room_uid: room, join_name: @user.email }
 
-      expect(response).to redirect_to(join_path(room, @user.name, { user_is_moderator: true }, @user.uid))
+      expect(response).to redirect_to(join_path(room, @user.email, { user_is_moderator: true }, @user.uid))
     end
 
     it "joins the room as moderator if room has the all_join_moderator setting" do
@@ -333,9 +333,9 @@ describe RoomsController, type: :controller do
       room.save
 
       @request.session[:user_id] = @user.id
-      post :join, params: { room_uid: room, join_name: @user.name }
+      post :join, params: { room_uid: room, join_name: @user.email }
 
-      expect(response).to redirect_to(join_path(room, @user.name, { user_is_moderator: true }, @user.uid))
+      expect(response).to redirect_to(join_path(room, @user.email, { user_is_moderator: true }, @user.uid))
     end
 
     it "joins the room as moderator if room doesn't have all_join_moderator but config is set to enabled" do
@@ -348,9 +348,9 @@ describe RoomsController, type: :controller do
       room.save
 
       @request.session[:user_id] = @user.id
-      post :join, params: { room_uid: room, join_name: @user.name }
+      post :join, params: { room_uid: room, join_name: @user.email }
 
-      expect(response).to redirect_to(join_path(room, @user.name, { user_is_moderator: true }, @user.uid))
+      expect(response).to redirect_to(join_path(room, @user.email, { user_is_moderator: true }, @user.uid))
     end
 
     it "doesn't join the room as moderator if room has the all_join_moderator setting but config is set to disabled" do
@@ -363,9 +363,9 @@ describe RoomsController, type: :controller do
       room.save
 
       @request.session[:user_id] = @user.id
-      post :join, params: { room_uid: room, join_name: @user.name }
+      post :join, params: { room_uid: room, join_name: @user.email }
 
-      expect(response).to redirect_to(join_path(room, @user.name, { user_is_moderator: false }, @user.uid))
+      expect(response).to redirect_to(join_path(room, @user.email, { user_is_moderator: false }, @user.uid))
     end
 
     it "should render wait if the correct access code is supplied" do
@@ -376,7 +376,7 @@ describe RoomsController, type: :controller do
       protected_room.save
 
       @request.session[:user_id] = @user.id
-      post :join, params: { room_uid: protected_room, join_name: @user.name }, session: { access_code: "123456" }
+      post :join, params: { room_uid: protected_room, join_name: @user.email }, session: { access_code: "123456" }
 
       expect(response).to render_template(:wait)
     end
@@ -389,7 +389,7 @@ describe RoomsController, type: :controller do
       protected_room.save
 
       @request.session[:user_id] = @user.id
-      post :join, params: { room_uid: protected_room, join_name: @user.name }, session: { access_code: "123455" }
+      post :join, params: { room_uid: protected_room, join_name: @user.email }, session: { access_code: "123455" }
 
       expect(response).to redirect_to room_path(protected_room.uid)
     end
@@ -527,7 +527,7 @@ describe RoomsController, type: :controller do
       @request.session[:user_id] = @user.id
       post :start, params: { room_uid: @user.main_room }
 
-      expect(response).to redirect_to(join_path(@user.main_room, @user.name, { user_is_moderator: true }, @user.uid))
+      expect(response).to redirect_to(join_path(@user.main_room, @user.email, { user_is_moderator: true }, @user.uid))
     end
 
     it "should bring to room if not owner" do
@@ -550,7 +550,7 @@ describe RoomsController, type: :controller do
 
       post :start, params: { room_uid: @user.main_room }
 
-      expect(response).to redirect_to(join_path(@user.main_room, @admin.name, { user_is_moderator: true }, @admin.uid))
+      expect(response).to redirect_to(join_path(@user.main_room, @admin.email, { user_is_moderator: true }, @admin.uid))
     end
 
     it "redirects to root path if not admin of current user" do
