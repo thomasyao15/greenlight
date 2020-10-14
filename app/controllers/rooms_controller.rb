@@ -174,7 +174,7 @@ class RoomsController < ApplicationController
     opts[:record] = record_meeting
 
     begin
-      redirect_to join_path(@room, current_user.email, opts, current_user.uid)
+      redirect_to join_path(@room, current_user.name, opts, current_user.email)
     rescue BigBlueButton::BigBlueButtonException => e
       logger.error("Support: #{@room.uid} start failed: #{e}")
 
